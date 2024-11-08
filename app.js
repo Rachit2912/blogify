@@ -5,7 +5,7 @@ const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
-const cookiePaser = require("cookie-parser");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -47,16 +47,15 @@ const {
 const PORT = process.env.PORT || 8000;
 
 mongoose
-  .connect(
-    "mongodb+srv://rachit_joshi:rachit_joshi@cluster0.6tisf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  )
-  .then((e) => console.log("MongoDB Connected"));
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"));
 
 app.use(express.urlencoded({ extended: false }));
-app.use(cookiePaser());
+app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));
 app.use(express.static(path.resolve("./public")));
 
