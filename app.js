@@ -8,6 +8,16 @@ mongoose.set("strictQuery", true);
 const cookieParser = require('cookie-parser');
 
 const app = express();
+
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5500", // Adjust this to your Svelte frontend port
+    credentials: true, // Allow cookies and credentials if needed
+  })
+);
+
 app.use(
   session({
     secret: "secret", // Change this to a secure random key
