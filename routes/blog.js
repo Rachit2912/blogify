@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const path = require("path");
+const { requireAuth } = require("../middlewares/authentication");
 
 const Blog = require("../models/blog");
 const Comment = require("../models/comment");
@@ -19,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get("/add-new", (req, res) => {
+router.get("/add-new", requireAuth, (req, res) => {
   return res.render("addBlog", {
     user: req.user,
   });
@@ -38,7 +39,7 @@ router.get("/:id", async (req, res) => {
   });
 });
 
-router.post("/comment/:blogId", async (req, res) => {
+router.post("/comment/:blogId", requireAuth, async (req, res) => {
   await Comment.create({
     content: req.body.content,
     blogId: req.params.blogId,
@@ -47,13 +48,14 @@ router.post("/comment/:blogId", async (req, res) => {
   return res.redirect(`/blog/${req.params.blogId}`);
 });
 
-router.post("/", upload.single("coverImage"), async (req, res) => {
+router.post("/", requireAuth, upload.single("coverImage"), async (req, res) => {
   const { title, body } = req.body;
+  const coverImageURL = req.file ? `/uploads/${req.file.filename}` : null;
   const blog = await Blog.create({
     body,
     title,
     createdBy: req.user._id,
-    coverImageURL: `/uploads/${req.file.filename}`,
+    coverImageURL,
   });
   return res.redirect(`/blog/${blog._id}`);
 });

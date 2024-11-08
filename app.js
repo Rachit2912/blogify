@@ -5,9 +5,16 @@ const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
+// const { checkForAuthenticationCookie } = require("./middleware/authMiddleware");
+const {
+  checkForAuthenticationCookie,
+} = require("./middlewares/authentication");
 
 const app = express();
+
+app.use(cookieParser());
+app.use(checkForAuthenticationCookie("authToken")); // Replace "authToken" with your actual cookie name
 
 const cors = require("cors");
 
@@ -39,15 +46,14 @@ const Blog = require("./models/blog");
 const userRoute = require("./routes/user");
 const blogRoute = require("./routes/blog");
 
-const {
-  checkForAuthenticationCookie,
-} = require("./middlewares/authentication");
-
 // const app = express();
 const PORT = process.env.PORT || 8000;
 
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -74,3 +80,5 @@ app.use("/user", userRoute);
 app.use("/blog", blogRoute);
 
 app.listen(PORT, () => console.log(`Server Started at PORT:${PORT}`));
+
+module.exports = app;
