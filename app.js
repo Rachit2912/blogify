@@ -4,6 +4,9 @@ const path = require("path");
 const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
+const fs = require("fs");
+//reading the pem file
+// const ca = fs.readFileSync(process.env.MONGODB_CERT_PATH);
 mongoose.set("strictQuery", true);
 const cookieParser = require("cookie-parser");
 // const { checkForAuthenticationCookie } = require("./middleware/authMiddleware");
@@ -53,6 +56,8 @@ mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    tls: true,
+    tlsCAFile: path.resolve(__dirname, "global-bundle.pem"), // ✅ correct way
   })
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
